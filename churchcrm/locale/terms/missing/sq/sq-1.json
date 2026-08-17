@@ -1,0 +1,30 @@
+{
+  "CSV": "",
+  "Email sent to %d family.": {
+    "one": "Email-i u dërgua tek %d familje.|Email-i u dërgua tek %d familje.",
+    "other": ""
+  },
+  "N/A": "",
+  "OFX": "",
+  "PDF successfully emailed to %d family.": {
+    "one": "PDF-i u dërgua me sukses me email tek %d familje.|PDF-i u dërgua me sukses me email tek %d familje.",
+    "other": ""
+  },
+  "Failed to get deposit count": "",
+  "Copied {{count}} members": {
+    "one": "",
+    "other": ""
+  },
+  "This list has {{count}} recipients — too many for a mailto: link. Use Copy Addresses instead.": {
+    "one": "",
+    "other": ""
+  },
+  "Too many recipients for email client ({{count}} > {{max}}). Use Copy Addresses instead.": {
+    "one": "",
+    "other": ""
+  },
+  "{{count}} min left": {
+    "one": "",
+    "other": ""
+  }
+}

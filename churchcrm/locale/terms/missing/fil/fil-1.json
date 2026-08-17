@@ -1,0 +1,33 @@
+{
+  "Access": "",
+  "Self-service": "",
+  "Feature": "",
+  "Check-out": "",
+  "Code": "",
+  "Live Preview": "",
+  "Sell-through": "",
+  "BCC Mode": "",
+  "Data": "",
+  "CSV": "",
+  "N/A": "",
+  "OFX": "",
+  "Preview": "",
+  "Teller": "",
+  "Failed to get deposit count": "",
+  "Copied {{count}} members": {
+    "one": "",
+    "other": ""
+  },
+  "This list has {{count}} recipients — too many for a mailto: link. Use Copy Addresses instead.": {
+    "one": "",
+    "other": ""
+  },
+  "Too many recipients for email client ({{count}} > {{max}}). Use Copy Addresses instead.": {
+    "one": "",
+    "other": ""
+  },
+  "{{count}} min left": {
+    "one": "",
+    "other": ""
+  }
+}

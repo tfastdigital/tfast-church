@@ -1,0 +1,256 @@
+// ***********************************************
+// Custom commands type definitions for Cypress
+// This file provides TypeScript support for custom commands
+// ***********************************************
+
+declare namespace Cypress {
+  interface Chainable {
+    /**
+     * Login as admin user
+     * @param location - The location to navigate to after login
+     * @param checkMatchingLocation - Whether to verify the location after login
+     */
+    loginAdmin(location: string, checkMatchingLocation?: boolean): Chainable<void>;
+
+    /**
+     * Login as standard user
+     * @param location - The location to navigate to after login
+     * @param checkMatchingLocation - Whether to verify the location after login
+     */
+    loginStandard(location: string, checkMatchingLocation?: boolean): Chainable<void>;
+
+    /**
+     * Generic login command
+     * @param username - The username to login with
+     * @param password - The password to login with
+     * @param location - The location to navigate to after login
+     * @param checkMatchingLocation - Whether to verify the location after login
+     */
+    login(
+      username: string,
+      password: string,
+      location: string,
+      checkMatchingLocation?: boolean
+    ): Chainable<void>;
+
+    /**
+     * Build a random string with prefix
+     * @param prefixString - The prefix to prepend to the random string
+     */
+    buildRandom(prefixString: string): Chainable<string>;
+
+    /**
+     * Create or reuse a cached login session
+     * @param sessionName - Unique identifier for the cached session
+     * @param username - Credential username
+     * @param password - Credential password
+     * @param options - Optional flags (forceLogin bypasses cached session)
+     */
+    setupLoginSession(
+      sessionName: string,
+      username: string,
+      password: string,
+      options?: { forceLogin?: boolean; validate?: () => void }
+    ): Chainable<void>;
+
+    /**
+     * Ensure an admin session is active (optionally forcing a fresh login)
+     */
+    setupAdminSession(options?: { forceLogin?: boolean }): Chainable<void>;
+
+    /**
+     * Ensure a standard session is active (optionally forcing a fresh login)
+     */
+    setupStandardSession(options?: { forceLogin?: boolean }): Chainable<void>;
+
+    /**
+     * Ensure a no-finance user session is active (optionally forcing a fresh login)
+     * Used to test that finance pages correctly deny access to non-finance users
+     */
+    setupNoFinanceSession(options?: { forceLogin?: boolean }): Chainable<void>;
+    /**
+     * Ensure a no-ManageFundraisers user session is active (optionally forcing a fresh login)
+     * Used to test that fundraiser pages correctly deny access to users without ManageFundraisers permission
+     */
+    setupNoManageFundraisersSession(options?: { forceLogin?: boolean }): Chainable<void>;
+
+    /**
+     * Wait for page to be fully loaded
+     */
+    waitForPageLoad(): Chainable<void>;
+
+    /**
+     * Get element by test ID (data-cy or data-testid)
+     * @param testId - The test ID to search for
+     */
+    getByTestId(testId: string): Chainable<JQuery<HTMLElement>>;
+
+    /**
+     * Make API request with admin privileges
+     * @param method - HTTP method
+     * @param url - Request URL
+     * @param body - Request body
+     * @param expectedStatus - Expected status code (default: 200)
+     */
+    makePrivateAdminAPICall(
+      method: string,
+      url: string,
+      body?: any,
+      expectedStatus?: number
+    ): Chainable<any>;
+
+    /**
+     * Make API request with user privileges
+     * @param method - HTTP method
+     * @param url - Request URL
+     * @param body - Request body
+     * @param expectedStatus - Expected status code (default: 200)
+     */
+    makePrivateUserAPICall(
+      method: string,
+      url: string,
+      body?: any,
+      expectedStatus?: number
+    ): Chainable<any>;
+
+    /**
+     * Make API request as a plain authenticated user (john.plainauth, no EditSelf/EditRecords/Admin)
+     * Used for testing that read access is available to all authenticated users by default.
+     * User has Notes=1 (passes AuthMiddleware) but no edit or admin capabilities.
+     * @param method - HTTP method
+     * @param url - Request URL
+     * @param body - Request body
+     * @param expectedStatus - Expected status code (default: 200)
+     */
+    makePrivatePlainAuthAPICall(
+      method: string,
+      url: string,
+      body?: any,
+      expectedStatus?: number
+    ): Chainable<any>;
+
+    /**
+     * Make API request as an EditSelf-only user (amanda.black, family 20)
+     * Used for testing family-scope authorization (GHSA-jjcj-h3cm-p7x7)
+     * @param method - HTTP method
+     * @param url - Request URL
+     * @param body - Request body
+     * @param expectedStatus - Expected status code (default: 200)
+     */
+    makePrivateEditSelfAPICall(
+      method: string,
+      url: string,
+      body?: any,
+      expectedStatus?: number
+    ): Chainable<any>;
+
+    /**
+     * Make API request as limited.user (id=4) — usr_Notes=0, usr_Admin=0,
+     * usr_EditRecords=0, usr_EditSelf=1. An EditSelf-ONLY user, blocked by
+     * AuthMiddleware::isEditSelfExclusive() → always returns 403.
+     * Use ONLY for Notes-gated 403 assertions.
+     *
+     * NOT a zero-permission user — that is noperm.user (id=901, EditSelf=0),
+     * which now passes the gate with read-only access (read-default policy).
+     */
+    makePrivateLimitedAPICall(
+      method: string,
+      url: string,
+      body?: any,
+      expectedStatus?: number
+    ): Chainable<any>;
+
+    /**
+     * Make API request as judith.matthews (id=95) — usr_EditRecords=1,
+     * usr_Notes=0, usr_Admin=0. Passes AuthMiddleware (has EditRecords) but
+     * canReadNotes() returns false. Use for timeline "200 but notes stripped"
+     * assertions.
+     */
+    makePrivateEditRecordsAPICall(
+      method: string,
+      url: string,
+      body?: any,
+      expectedStatus?: number
+    ): Chainable<any>;
+
+    /**
+     * MenuOptions-only user (id=902): usr_MenuOptions=1, all other perm flags 0,
+     * non-admin, non-EditSelf. Used to verify the EditRecords gate on person/family
+     * property routes (GHSA-4wmp-3v34-g7q8). Passes MenuOptions middleware but is
+     * blocked by EditRecordsRoleAuthMiddleware — expects 403 on record-level routes.
+     */
+    makePrivateMenuOptionsAPICall(
+      method: string,
+      url: string,
+      body?: any,
+      expectedStatus?: number,
+      timeoutMs?: number
+    ): Chainable<any>;
+
+    /**
+     * Regression sentinel: EditSelf+Notes user (user 100, Lena Black, family 20).
+     * Post-PR#9016 the user is blocked by AuthMiddleware (403). Once EditSelf
+     * exclusivity is relaxed, avatar/nav/photo should assert 200 (FamilyReadMiddleware)
+     * vs 403 (FamilyMiddleware) for a non-own family.
+     */
+    makePrivateEditSelfPlusNotesAPICall(
+      method: string,
+      url: string,
+      body?: any,
+      expectedStatus?: number
+    ): Chainable<any>;
+
+    /**
+     * Make API request with specific API key
+     * @param key - API key to use
+     * @param method - HTTP method
+     * @param url - Request URL
+     * @param body - Request body
+     * @param expectedStatus - Expected status code (default: 200)
+     */
+    makePrivateAPICall(
+      key: string,
+      method: string,
+      url: string,
+      body?: any,
+      expectedStatus?: number
+    ): Chainable<any>;
+
+    /**
+     * Modern API request command with enhanced error handling
+     * @param options - Request options (same as cy.request)
+     */
+    apiRequest(options: any): any;
+
+    /**
+     * Create a person with specific birthday data for testing
+     * @param personData - Object containing name, month, day, year for the person
+     */
+    createPersonWithBirthday(personData: {
+      name: string;
+      month: number;
+      day: number;
+      year?: number | null;
+    }): void;
+
+    /**
+     * Delete a person by searching for their name
+     * @param name - The name of the person to delete
+     */
+    deletePersonByName(name: string): void;
+
+    /**
+     * Create multiple people via CSV import to bypass UI validation
+     * @param peopleData - Object containing person data with birth date info
+     */
+    createPeopleViaCSV(peopleData: Record<string, any>): void;
+
+    /**
+     * Wait for a Notyf notification with specific text
+     * Ensures locales are loaded first (for i18next translations) and verifies notification content
+     * @param expectedText - The text to find in the notification
+     * @param options - Optional config { timeout: 5000 }
+     */
+    waitForNotification(expectedText: string, options?: { timeout?: number }): Chainable<void>;
+  }
+}

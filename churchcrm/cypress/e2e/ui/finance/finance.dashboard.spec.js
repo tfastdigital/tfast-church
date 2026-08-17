@@ -1,0 +1,189 @@
+/// <reference types="cypress" />
+
+/**
+ * Finance Dashboard Tests
+ *
+ * Tests for the new /finance/ module with Slim 4 MVC structure.
+ * The finance dashboard provides:
+ * - YTD payment and pledge metrics
+ * - Tax year reporting checklist
+ * - Quick actions for deposits and reports
+ * - Recent deposits list
+ * - Donation funds overview
+ */
+
+describe("Finance Dashboard", () => {
+    beforeEach(() => {
+        cy.setupAdminSession();
+    });
+
+    it("should load the finance dashboard", () => {
+        cy.visit("/finance/");
+        cy.contains("Finance Dashboard");
+        cy.contains("Fiscal Year");
+    });
+
+    it("should display YTD metrics cards", () => {
+        cy.visit("/finance/");
+
+        // Check for the 4 metric cards
+        cy.contains("YTD Payments");
+        cy.contains("YTD Pledges");
+        cy.contains("Donor Families");
+        cy.contains("Total Payments");
+    });
+
+    it("should display action buttons", () => {
+        cy.visit("/finance/");
+
+        cy.contains("Create Deposit");
+        cy.contains("Reports");
+    });
+
+    it("should navigate to deposits page from Create Deposit button", () => {
+        cy.visit("/finance/");
+
+        // Find and click the Create Deposit button
+        cy.contains("a", "Create Deposit").click();
+        cy.url().should("contain", "/finance/deposit/search");
+        cy.contains("Deposits");
+    });
+
+    it("should navigate to reports page from Reports button", () => {
+        cy.visit("/finance/");
+
+        // Find and click the Reports button
+        cy.contains("a", "Reports").click();
+        cy.url().should("contain", "/finance/reports");
+        cy.contains("Financial Reports");
+    });
+
+    it("should display Tax Year Reporting Checklist", () => {
+        cy.visit("/finance/");
+
+        cy.contains("Tax Year Reporting Checklist");
+        cy.contains("Close All Deposits");
+        cy.contains("Review Donation Funds");
+        cy.contains("Church Information");
+        cy.contains("Tax Report Verbiage");
+        cy.contains("Generate Tax Statements");
+    });
+
+    it("should display Recent Deposits section", () => {
+        cy.visit("/finance/");
+
+        cy.contains("Recent Deposits");
+        cy.contains("View All");
+
+        // Check table headers if deposits exist
+        cy.get("body").then(($body) => {
+            if ($body.find("table.table-hover").length > 0) {
+                cy.contains("th", "ID");
+                cy.contains("th", "Date");
+                cy.contains("th", "Type");
+                cy.contains("th", "Status");
+            }
+        });
+    });
+
+    it("should display Deposit Statistics sidebar", () => {
+        cy.visit("/finance/");
+
+        cy.contains("Deposit Statistics");
+        cy.contains("Total Deposits:");
+        cy.contains("Open Deposits:");
+        cy.contains("Closed Deposits:");
+    });
+
+    it("should display Donation Funds sidebar", () => {
+        cy.visit("/finance/");
+
+        cy.contains("Donation Funds");
+    });
+
+    it("should link to Donation Fund admin page from Manage Funds button", () => {
+        cy.visit("/finance/");
+
+        // Admin should see Manage Funds link
+        cy.contains("a", "Manage Funds").click();
+        cy.url().should("contain", "/finance/funds");
+    });
+
+    it("should navigate to settings from Church Information checklist item", () => {
+        cy.visit("/finance/");
+
+        // Find the Settings button in the Church Information checklist row
+        cy.contains(".list-group-item", "Church Information")
+            .find("a")
+            .contains("Settings")
+            .click();
+
+        cy.url().should("contain", "admin/system/church-info");
+    });
+
+    it("should link deposits checklist to deposit search page", () => {
+        cy.visit("/finance/");
+
+        // Find the View button in the Close All Deposits row
+        cy.contains("Close All Deposits")
+            .parents(".list-group-item")
+            .find("a")
+            .contains("View")
+            .click();
+
+        cy.url().should("contain", "/finance/deposit/search");
+        cy.contains("Deposits");
+    });
+});
+
+describe("Finance Dashboard - Standard User Access", () => {
+    beforeEach(() => {
+        cy.setupStandardSession();
+    });
+
+    it("should allow standard users with finance permission to access the dashboard", () => {
+        // The standard test user (tony.wade) has finance permissions enabled in demo database
+        cy.visit("/finance/");
+
+        // Should be able to see the dashboard (page title is in h2.page-title from Tabler layout)
+        cy.get("h2.page-title").should("contain", "Finance Dashboard");
+
+        // Metrics should be visible (overview card with stat cards)
+        cy.contains("YTD Payments").should("exist");
+    });
+
+    it("should not show the Church Information settings link to non-admin users", () => {
+        cy.visit("/finance/");
+
+        // The Church Information checklist row should be visible (badge/status)
+        cy.contains(".list-group-item", "Church Information").should("exist");
+
+        // But the Settings link to admin/system/church-info should NOT be visible
+        cy.contains(".list-group-item", "Church Information")
+            .find("a[href*='admin/system/church-info']")
+            .should("not.exist");
+    });
+});
+
+describe("Finance Dashboard - No Finance Permission", () => {
+    beforeEach(() => {
+        cy.setupNoFinanceSession();
+    });
+
+    it("should deny access to users without finance permission", () => {
+        // User judith.matthews has no finance permission
+        cy.visit("/finance/", { failOnStatusCode: false });
+        
+        // Should be redirected to access-denied page
+        cy.url().should("include", "/v2/access-denied");
+        cy.url().should("include", "role=Finance");
+    });
+
+    it("should deny access to finance reports for users without finance permission", () => {
+        cy.visit("/finance/reports", { failOnStatusCode: false });
+        
+        // Should be redirected to access-denied page
+        cy.url().should("include", "/v2/access-denied");
+        cy.url().should("include", "role=Finance");
+    });
+});

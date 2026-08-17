@@ -1,0 +1,32 @@
+{
+  "Auto": "",
+  "CSV": "",
+  "Email sent to %d family.": {
+    "one": "E-mail wysłany do %d rodziny.|E-mail wysłany do %d rodzin.|E-mail wysłany do %d rodzin.",
+    "few": "",
+    "other": ""
+  },
+  "OFX": "",
+  "PDF successfully emailed to %d family.": {
+    "one": "PDF został pomyślnie wysłany e-mailem do %d rodziny.|PDF został pomyślnie wysłany e-mailem do %d rodzin.|PDF został pomyślnie wysłany e-mailem do %d rodzin.",
+    "few": "",
+    "other": ""
+  },
+  "Failed to get deposit count": "",
+  "Copied {{count}} members": {
+    "one": "",
+    "other": ""
+  },
+  "This list has {{count}} recipients — too many for a mailto: link. Use Copy Addresses instead.": {
+    "one": "",
+    "other": ""
+  },
+  "Too many recipients for email client ({{count}} > {{max}}). Use Copy Addresses instead.": {
+    "one": "",
+    "other": ""
+  },
+  "{{count}} min left": {
+    "one": "",
+    "other": ""
+  }
+}
