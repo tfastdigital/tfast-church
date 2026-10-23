@@ -28,3 +28,31 @@ RewriteRule ^(.*)$ index.php [QSA,L]
 order allow,deny
 deny from all
 </files>
+
+# ==========================================================================
+# Security hardening (23 Oct 2026). Safe defaults that do not change how
+# pages look (no CSP, because inline scripts/styles are in use).
+# ==========================================================================
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+</IfModule>
+
+# Deny secrets, VCS metadata, dumps and archives (works without mod_rewrite).
+<FilesMatch "(?i)^(\.env.*|\.git.*|\.user\.ini|\.htaccess|composer\.(json|lock)|.*\.(sql|sqlite|db|log|bak|old|orig|swp|tar|gz|tgz))$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule (^|/)\.git(/|$) - [F,L]
+</IfModule>
