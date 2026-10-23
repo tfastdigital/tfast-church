@@ -38,7 +38,7 @@ jobs:
       - name: Supply-chain IOC check (laravel-lang compromise, May 2026)
         run: |
           set -e
-          if grep -RIl --exclude-dir=.git --exclude-dir=.github -i "flipboxstudio" . ; then
+          if grep -RIl --exclude-dir=.git --exclude-dir=.github --exclude=SECURITY.md -i "flipboxstudio" . ; then
             echo "::error::Known supply-chain IOC 'flipboxstudio' found. Treat the server as compromised and rotate secrets."
             exit 1
           fi
